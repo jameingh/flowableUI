@@ -2,10 +2,7 @@ package com.dbapp.flowableui.controller;
 
 import com.dbapp.flowableui.service.MyService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +13,7 @@ import java.util.stream.Collectors;
  * @description
  */
 @RestController
+@RequestMapping("/rest")
 public class MyRestController {
     @Autowired
     private MyService myService;
