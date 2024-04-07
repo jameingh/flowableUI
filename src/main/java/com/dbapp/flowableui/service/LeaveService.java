@@ -4,9 +4,11 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.task.api.Task;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -36,4 +38,17 @@ public class LeaveService {
         String outcome = "outStr";
         runtimeService.startProcessInstanceWithForm(proDefId, outcome, formProperties, "表单任务");
     }
+
+    @Transactional
+    public void complete(String groupName){
+        final List<Task> taskList = taskService.createTaskQuery().taskCandidateGroup(groupName).orderByTaskCreateTime().desc().list();
+        final String taskId = taskList.get(0).getId();
+        Map<String, Object> processVariables = taskService.getVariables(taskId);
+        System.out.println(processVariables);
+        final HashMap<String, Object> param = new HashMap<>();
+        param.put("leaderApproved", true);
+        taskService.complete(taskId, param);
+    }
+
+
 }

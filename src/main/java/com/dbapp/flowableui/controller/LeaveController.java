@@ -2,6 +2,7 @@ package com.dbapp.flowableui.controller;
 
 import com.dbapp.flowableui.service.LeaveService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,5 +20,10 @@ public class LeaveController {
     @PostMapping("/process")
     public void startProcess() {
         leaveService.startProcess();
+    }
+
+    @GetMapping("/complete")
+    public void complete(String groupName) {
+        leaveService.complete(groupName);
     }
 }
