@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             xmlns:flowable="http://flowable.org/bpmn"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://www.flowable.org/processdef">
+
+    <process id="leaveProcess" name="请假流程" isExecutable="true">
+        <startEvent id="theStart" flowable:formKey="leave">
+            <extensionElements>
+                <flowable:executionListener event="start"
+                     expression="${execution.setVariable('leave', leaveEntityManager.newLeave(execution))}"/>
+            </extensionElements>
+        </startEvent>
+        <sequenceFlow sourceRef="theStart" targetRef="theLeaderApprove"/>
+        <userTask id="theLeaderApprove" name="部门经理审批" flowable:candidateGroups="leader" >
+            <extensionElements>
+                <flowable:taskListener event="complete" expression="${leave.setLeaderApproved(leaderApproved)}"/>
+            </extensionElements>
+        </userTask>
+        <sequenceFlow sourceRef="theLeaderApprove" targetRef="theEnd"/>
+        <endEvent id="theEnd">
+            <extensionElements>
+                <flowable:executionListener event="end"
+                    delegateExpression="${leaveEndListener}"/>
+            </extensionElements>
+        </endEvent>
+    </process>
+</definitions>
