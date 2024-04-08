@@ -22,6 +22,7 @@ public class LeaveEndListener implements ExecutionListener {
     @Override
     public void notify(DelegateExecution execution) {
         final String processInstanceId = execution.getProcessInstanceId();
+        // 通过jdbcTemplate直接执行sql，删除流程变量
         jdbcTemplate.update("delete from act_hi_varinst where proc_inst_id_ = ?", processInstanceId);
     }
 }

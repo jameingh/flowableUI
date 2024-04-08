@@ -3,7 +3,8 @@ package com.dbapp.flowableui.config;
 /**
  * @author JinXin
  * @date 2024/4/7 20:36
- * @description https://github.com/LukeL99/joda-time-mybatis/blob/master/src/main/java/org/joda/time/mybatis/handlers/LocalDateTypeHandler.java
+ * @description joda time type handler
+ * https://github.com/LukeL99/joda-time-mybatis/blob/master/src/main/java/org/joda/time/mybatis/handlers/LocalDateTypeHandler.java
  */
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedTypes;

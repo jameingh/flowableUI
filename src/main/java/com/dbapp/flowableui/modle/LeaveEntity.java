@@ -18,7 +18,9 @@ import java.io.Serializable;
 public class LeaveEntity implements Serializable {
 
     private Long id;
+    // mybatis-plus默认支持驼峰和下划线命名转换
     private String processInstanceId;
+    // 指定joda time 转换处理器
     @TableField(value = "start_time", typeHandler = LocalDateTypeHandler.class)
     private LocalDate startTime;
     @TableField(value = "end_time", typeHandler = LocalDateTypeHandler.class)

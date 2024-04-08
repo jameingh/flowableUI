@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * @author JinXin
  * @date 2024/4/7 17:49
- * @description
+ * @description 定义请假流程start事件调用的类和方法，单独保存LeaveEntity
  */
 @Service
 public class LeaveEntityManager {
