@@ -1,5 +1,15 @@
 # 工程简介
 
+# 快速开发
+
+swagger入口/idea中使用RestfulBox调试更快
+
+http://127.0.0.1:8082/flowable-ui/doc.html
+
+流程设计器入口，需要添加UI相关依赖
+
+http://127.0.0.1:8082/flowable-ui/modeler/
+
 # 延伸阅读
 
 # 注意事项
