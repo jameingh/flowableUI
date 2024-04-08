@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+        id: 20240408-01
+        author: kim
+        changes:
+          - sqlFile:
+              splitStatements: true
+              encoding: UTF-8
+              stripComments: true
+              path: db/changelog/db.changelog-20240408-01.sql
