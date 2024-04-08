@@ -14,7 +14,7 @@
         <startEvent id="theStart"/>
         <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask"/>
         <userTask id="theTask" name="my task"
-                  flowable:assignee="jack"/>
+                  flowable:assignee="jack" flowable:dueDate="${dateVariable}"/>
         <sequenceFlow id="flow2" sourceRef="theTask" targetRef="theEnd"/>
         <endEvent id="theEnd"/>
     </process>

@@ -37,4 +37,14 @@ public class MyRestController {
         }).collect(Collectors.toList());
     }
 
+    @GetMapping("/tasks/count")
+    public long getTaskCount(@RequestParam String assignee) {
+        return myService.getTaskCount(assignee);
+    }
+
+    @GetMapping("/tasks/countwithoutduedate")
+    public long getTaskCountWithoutTaskDueDate(@RequestParam String assignee) {
+        return myService.getTaskCountWithoutTaskDueDate(assignee);
+    }
+
 }

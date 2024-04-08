@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -22,11 +23,22 @@ public class MyService {
     private TaskService taskService;
     @Transactional
     public void startProcess() {
-        runtimeService.startProcessInstanceByKey("oneTaskProcess");
+//        runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        final HashMap<String, Object> formProperties = new HashMap<>();
+        formProperties.put("dateVariable", "2024-04-03");
+        runtimeService.startProcessInstanceByKey("oneTaskProcess", formProperties);
     }
 
-    @Transactional
     public List<Task> getTasks(String assignee) {
+
         return taskService.createTaskQuery().taskAssignee(assignee).list();
+    }
+
+    public long getTaskCount(String assignee) {
+        return taskService.createTaskQuery().taskAssignee(assignee).count();
+    }
+
+    public long getTaskCountWithoutTaskDueDate(String assignee) {
+        return taskService.createTaskQuery().taskAssignee(assignee).withoutTaskDueDate().count();
     }
 }
