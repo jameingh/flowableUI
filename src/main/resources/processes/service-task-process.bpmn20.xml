@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             xmlns:flowable="http://flowable.org/bpmn"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://www.flowable.org/processdef">
+
+    <process id="serviceTaskProcess" name="The One Service Task Process" isExecutable="true">
+        <startEvent id="theStart"/>
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask1"/>
+        <serviceTask id="theTask1" name="The Task1" flowable:expression="#{printService.printMessage()}"/>
+        <sequenceFlow id="flow2" sourceRef="theTask1" targetRef="theTask2"/>
+        <serviceTask id="theTask2" name="The Task2" flowable:expression="#{invokerService.data}"
+                     flowable:resultVariable="result">
+            <extensionElements>
+                <flowable:executionListener event="end"
+                     expression="${someService1.consumeMethod(execution)}"/>
+            </extensionElements>
+        </serviceTask>
+        <sequenceFlow id="flow3" sourceRef="theTask2" targetRef="theEnd"/>
+        <endEvent id="theEnd"/>
+    </process>
+
+</definitions>

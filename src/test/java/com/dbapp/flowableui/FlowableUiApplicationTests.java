@@ -78,4 +78,16 @@ class FlowableUiApplicationTests {
         assertEquals(0, taskService.createTaskQuery().count());
     }
 
+    /**
+     * 测试serviceTask
+     */
+    @Test
+    @Deployment
+    @Transactional
+    public void oneServiceTaskProcessTest() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("serviceTaskProcess");
+        log.info("process instance id: " + processInstance.getId());
+        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+    }
+
 }
