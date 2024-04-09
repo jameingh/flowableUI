@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -68,6 +69,13 @@ class FlowableUiApplicationTests {
         for (IdentityLink identityLink : identityLinksForTask) {
             log.info("identity link user: {}" ,identityLink.getUserId());
         }
+        // 根据参与人查询任务列表
+        final Task task1 = taskService.createTaskQuery().taskInvolvedUser("tom").singleResult();
+        final Task task2 = taskService.createTaskQuery().taskInvolvedGroups(Arrays.asList("leader")).singleResult();
+        assertEquals(true, task2.getId().equals(task1.getId()));
+        // 根据候选人查不出来，但是设置了候选人，不知道是不是姿势不对
+        final Task task3 = taskService.createTaskQuery().taskCandidateUser("tom").singleResult();
+        assertEquals(null, task3);
 //        taskService.claim(task.getId(), "kim");
 // 只能对unclaim的任务进行claim。否则报错already claimed by someone else
         taskService.unclaim(task.getId());
@@ -84,7 +92,7 @@ class FlowableUiApplicationTests {
     @Test
     @Deployment
     @Transactional
-    public void oneServiceTaskProcessTest() {
+    public void serviceTaskProcessTest() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("serviceTaskProcess");
         log.info("process instance id: " + processInstance.getId());
         assertEquals(0, runtimeService.createProcessInstanceQuery().count());
