@@ -16,6 +16,7 @@ import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.image.impl.DefaultProcessDiagramGenerator;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -98,14 +99,16 @@ class FlowableUiApplicationTests {
         taskService.delegateTask(task.getId(), "kim");
         // 查询被委派且未签收的任务（委派的底层实现是修改任务的委派状态，有 pending和resolved两种状态）
         final List<Task> list = taskService.createTaskQuery().taskDelegationState(DelegationState.PENDING).taskAssignee("kim").list();
+        // todo 有没有其他方式查询委派任务，和查询办理人的api统一一下逻辑？
+        // todo 任务办理人提前办理任务会怎样？此时委派人还未处理任务
+//        taskService.complete(task.getId());
         // 被委派人处理完成任务
         taskService.resolveTask(task.getId());
 
-        task = taskService.createTaskQuery().singleResult();
         log.info("task assignee: " + task.getAssignee());
         taskService.complete(task.getId());
         assertEquals(0, taskService.createTaskQuery().count());
-        generateProcessDiagram(processDefinitionKey, "taskListenerProcess.png");
+        generateProcessDiagram(processDefinitionKey);
     }
 
     /**
@@ -120,13 +123,51 @@ class FlowableUiApplicationTests {
         assertEquals(0, runtimeService.createProcessInstanceQuery().count());
     }
 
+    @Test
+    @Deployment
+//    @Transactional
+    public void subTaskProcessTest() {
+        String processDefinitionKey = "subTaskProcess";
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey);
+        log.info("process instance id: " + processInstance.getId());
+        assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+        Task task = taskService.createTaskQuery().singleResult();
+        assertEquals("my task", task.getName());
+
+        // 创建子任务,new task的任务必须调用saveTask方法才能持久化
+        final Task subTask1 = taskService.newTask();
+        // 设置父任务id,建立父子关系
+        subTask1.setParentTaskId(task.getId());
+        // 设置子任务的其他属性
+        subTask1.setAssignee("tom");
+        subTask1.setName("subTask 1");
+        subTask1.setOwner("tom");
+
+        // 保存子任务
+        taskService.saveTask(subTask1);
+        taskService.complete(subTask1.getId());
+
+        // 根据父任务查询子任务
+        final List<HistoricTaskInstance> subTasks = historyService.createHistoricTaskInstanceQuery().taskParentTaskId(task.getId()).list();
+        log.info("sub tasks: " + subTasks);
+        // 查询父任务
+        final HistoricTaskInstance historicTaskInstance =
+                historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
+        log.info("parent task: " + historicTaskInstance);
+
+        // 子任务未办理，父任务可以完成吗？可以
+        taskService.complete(task.getId());
+        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+        generateProcessDiagram(processDefinitionKey);
+    }
+
     @Autowired
     private RepositoryService repositoryService;
 
     @Autowired
     private HistoryService historyService;
 
-    public void generateProcessDiagram(String processDefinitionKey, String filePath) {
+    public void generateProcessDiagram(String processDefinitionKey) {
         ProcessDefinition pd = repositoryService.createProcessDefinitionQuery()
                 .processDefinitionKey(processDefinitionKey).latestVersion().singleResult();
         BpmnModel bpmnModel = repositoryService.getBpmnModel(pd.getId());
@@ -149,7 +190,7 @@ class FlowableUiApplicationTests {
         DefaultProcessDiagramGenerator generator = new DefaultProcessDiagramGenerator();
         InputStream inputStream = generator.generateDiagram(bpmnModel, "PNG", highLightedActivities, hightLightedFlows, scaleFactor, drawSqquenceFlowNameWithNoLabelDI);
         try {
-            FileUtils.copyInputStreamToFile(inputStream, new File(filePath));
+            FileUtils.copyInputStreamToFile(inputStream, new File(processDefinitionKey+".png"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
