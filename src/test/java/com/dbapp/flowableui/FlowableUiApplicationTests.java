@@ -14,6 +14,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.image.impl.DefaultProcessDiagramGenerator;
+import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,6 +94,13 @@ class FlowableUiApplicationTests {
 // 只能对unclaim的任务进行claim。否则报错already claimed by someone else
         taskService.unclaim(task.getId());
         taskService.claim(task.getId(), "tom");
+        // 任务委派给kim
+        taskService.delegateTask(task.getId(), "kim");
+        // 查询被委派且未签收的任务（委派的底层实现是修改任务的委派状态，有 pending和resolved两种状态）
+        final List<Task> list = taskService.createTaskQuery().taskDelegationState(DelegationState.PENDING).taskAssignee("kim").list();
+        // 被委派人处理完成任务
+        taskService.resolveTask(task.getId());
+
         task = taskService.createTaskQuery().singleResult();
         log.info("task assignee: " + task.getAssignee());
         taskService.complete(task.getId());

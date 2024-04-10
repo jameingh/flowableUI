@@ -10,7 +10,7 @@
              expressionLanguage="http://www.w3.org/1999/XPath"
              targetNamespace="http://www.flowable.org/processdef">
 
-    <process id="taskListenerProcess" name="The One Task Process" isExecutable="true">
+    <process id="taskListenerProcess" name="The Task Listener Process" isExecutable="true">
         <startEvent id="theStart"/>
         <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask"/>
         <userTask id="theTask" name="my task"
