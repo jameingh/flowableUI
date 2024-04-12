@@ -1,19 +1,13 @@
 package com.kim.flowableui;
 
+import com.kim.flowableui.util.ProcessSupport;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
-import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.HistoryService;
-import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.history.HistoricActivityInstance;
-import org.flowable.engine.history.HistoricProcessInstance;
-import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.IdentityLink;
-import org.flowable.image.impl.DefaultProcessDiagramGenerator;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -22,10 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -39,12 +29,14 @@ class FlowableUiApplicationTests {
     @Test
     void contextLoads() {
     }
-
     @Autowired
     private RuntimeService runtimeService;
-
     @Autowired
     private TaskService taskService;
+    @Autowired
+    private HistoryService historyService;
+    @Autowired
+    private ProcessSupport processSupport;
 
     // 在processes目录下的流程定义文件会自动部署，不需要特别声明
 //    @Deployment(resources = { "processes/one-task-process.bpmn20.xml" })
@@ -108,7 +100,7 @@ class FlowableUiApplicationTests {
         log.info("task assignee: " + task.getAssignee());
         taskService.complete(task.getId());
         assertEquals(0, taskService.createTaskQuery().count());
-        generateProcessDiagram(processDefinitionKey);
+        processSupport.generateProcessDiagram(processDefinitionKey);
     }
 
     /**
@@ -158,42 +150,7 @@ class FlowableUiApplicationTests {
         // 子任务未办理，父任务可以完成吗？可以
         taskService.complete(task.getId());
         assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-        generateProcessDiagram(processDefinitionKey);
-    }
-
-    @Autowired
-    private RepositoryService repositoryService;
-
-    @Autowired
-    private HistoryService historyService;
-
-    public void generateProcessDiagram(String processDefinitionKey) {
-        ProcessDefinition pd = repositoryService.createProcessDefinitionQuery()
-                .processDefinitionKey(processDefinitionKey).latestVersion().singleResult();
-        BpmnModel bpmnModel = repositoryService.getBpmnModel(pd.getId());
-        HistoricProcessInstance hpi = historyService.createHistoricProcessInstanceQuery().singleResult();
-        if (hpi == null) {
-            return;
-        }
-        List<String> highLightedActivities = new ArrayList<>();
-        List<String> hightLightedFlows = new ArrayList<>();
-        double scaleFactor = 1.0;
-        boolean drawSqquenceFlowNameWithNoLabelDI = true;
-        List<HistoricActivityInstance> list = historyService.createHistoricActivityInstanceQuery().processInstanceId(hpi.getId()).list();
-        for (HistoricActivityInstance hai : list) {
-            if (hai.getActivityType().equals("sequenceFlow")) {
-                hightLightedFlows.add(hai.getActivityId());
-            } else {
-                highLightedActivities.add(hai.getActivityId());
-            }
-        }
-        DefaultProcessDiagramGenerator generator = new DefaultProcessDiagramGenerator();
-        InputStream inputStream = generator.generateDiagram(bpmnModel, "PNG", highLightedActivities, hightLightedFlows, scaleFactor, drawSqquenceFlowNameWithNoLabelDI);
-        try {
-            FileUtils.copyInputStreamToFile(inputStream, new File(processDefinitionKey+".png"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        processSupport.generateProcessDiagram(processDefinitionKey);
     }
 
 }
