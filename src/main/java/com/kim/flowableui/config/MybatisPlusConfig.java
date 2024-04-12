@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
  * @description
  */
 @Configuration
-@MapperScan(basePackages = "com.dbapp.flowableui.mapper",
+@MapperScan(basePackages = "com.kim.flowableui.mapper",
         // flowable ui内置了多个sqlSessionFactory，有不同的别名，
         // 在这里，指定本项目业务mapper的sqlSessionFactory为mybatis-plus的sqlSessionFactory
         sqlSessionFactoryRef = "sqlSessionFactory",
