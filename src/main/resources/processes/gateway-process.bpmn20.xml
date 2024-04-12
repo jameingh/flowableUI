@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+             xmlns:flowable="http://flowable.org/bpmn"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://www.flowable.org/processdef">
+
+    <signal id="alertSignal" name="信号1" />
+    <process id="catchSignalProcess" name="事件网关流程">
+        <startEvent id="theStart" name="开始">
+            <outgoing>Flow_0kg6aka</outgoing>
+        </startEvent>
+        <sequenceFlow id="Flow_0kg6aka" sourceRef="theStart" targetRef="eventGw1" />
+        <eventBasedGateway id="eventGw1">
+            <incoming>Flow_0kg6aka</incoming>
+            <outgoing>Flow_1rv6jvo</outgoing>
+            <outgoing>Flow_18gmzoy</outgoing>
+        </eventBasedGateway>
+        <intermediateCatchEvent id="signalEvent" name="信号事件">
+            <incoming>Flow_1rv6jvo</incoming>
+            <outgoing>Flow_17rn34r</outgoing>
+            <signalEventDefinition id="SignalEventDefinition_06ubi1g" signalRef="alertSignal"/>
+        </intermediateCatchEvent>
+        <sequenceFlow id="Flow_1rv6jvo" sourceRef="eventGw1" targetRef="signalEvent" />
+        <intermediateCatchEvent id="timerEvent">
+            <incoming>Flow_18gmzoy</incoming>
+            <outgoing>Flow_1p9y8io</outgoing>
+            <timerEventDefinition id="TimerEventDefinition_1kc6gko" >
+                <timeDuration>PT1M</timeDuration>
+            </timerEventDefinition>
+        </intermediateCatchEvent>
+        <sequenceFlow id="Flow_18gmzoy" sourceRef="eventGw1" targetRef="timerEvent" />
+        <sequenceFlow id="Flow_17rn34r" sourceRef="signalEvent" targetRef="task" />
+        <userTask id="task" name="处理警报">
+            <incoming>Flow_17rn34r</incoming>
+            <outgoing>Flow_1ldbun0</outgoing>
+        </userTask>
+        <exclusiveGateway id="exGw">
+            <incoming>Flow_1ldbun0</incoming>
+            <incoming>Flow_1p9y8io</incoming>
+            <outgoing>Flow_12dm8la</outgoing>
+        </exclusiveGateway>
+        <sequenceFlow id="Flow_1ldbun0" sourceRef="task" targetRef="exGw" />
+        <sequenceFlow id="Flow_1p9y8io" sourceRef="timerEvent" targetRef="exGw" />
+        <endEvent id="theEnd">
+            <incoming>Flow_12dm8la</incoming>
+        </endEvent>
+        <sequenceFlow id="Flow_12dm8la" sourceRef="exGw" targetRef="theEnd" />
+    </process>
+    <bpmndi:BPMNDiagram id="BPMNDiagram_flow">
+        <bpmndi:BPMNPlane id="BPMNPlane_flow" bpmnElement="catchSignal">
+            <bpmndi:BPMNEdge id="Flow_0kg6aka_di" bpmnElement="Flow_0kg6aka">
+                <di:waypoint x="65" y="215" />
+                <di:waypoint x="115" y="215" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_1rv6jvo_di" bpmnElement="Flow_1rv6jvo">
+                <di:waypoint x="165" y="215" />
+                <di:waypoint x="222" y="215" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_18gmzoy_di" bpmnElement="Flow_18gmzoy">
+                <di:waypoint x="140" y="240" />
+                <di:waypoint x="140" y="330" />
+                <di:waypoint x="222" y="330" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_17rn34r_di" bpmnElement="Flow_17rn34r">
+                <di:waypoint x="258" y="215" />
+                <di:waypoint x="320" y="215" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_1ldbun0_di" bpmnElement="Flow_1ldbun0">
+                <di:waypoint x="420" y="215" />
+                <di:waypoint x="485" y="215" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_1p9y8io_di" bpmnElement="Flow_1p9y8io">
+                <di:waypoint x="258" y="330" />
+                <di:waypoint x="510" y="330" />
+                <di:waypoint x="510" y="240" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_12dm8la_di" bpmnElement="Flow_12dm8la">
+                <di:waypoint x="535" y="215" />
+                <di:waypoint x="602" y="215" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNShape id="BPMNShape_startNode1" bpmnElement="theStart">
+                <omgdc:Bounds x="35" y="200" width="30" height="30" />
+                <bpmndi:BPMNLabel>
+                    <omgdc:Bounds x="38" y="237" width="22" height="14" />
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Gateway_00effne_di" bpmnElement="eventGw1">
+                <omgdc:Bounds x="115" y="190" width="50" height="50" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="signalEvent_di" bpmnElement="signalEvent">
+                <omgdc:Bounds x="222" y="197" width="36" height="36" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="timerEvent_di" bpmnElement="timerEvent">
+                <omgdc:Bounds x="222" y="312" width="36" height="36" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Activity_1xo7l9p_di" bpmnElement="task">
+                <omgdc:Bounds x="320" y="175" width="100" height="80" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Gateway_1nsdv4n_di" bpmnElement="exGw" isMarkerVisible="true">
+                <omgdc:Bounds x="485" y="190" width="50" height="50" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Event_185wqxa_di" bpmnElement="theEnd">
+                <omgdc:Bounds x="602" y="197" width="36" height="36" />
+            </bpmndi:BPMNShape>
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+</definitions>
