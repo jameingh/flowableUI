@@ -16,7 +16,7 @@
         <userTask id="theTask" name="my task"
                   flowable:assignee="jack">
             <extensionElements>
-                <flowable:taskListener event="create" class="com.kim.flowableui.listener.AssignmentListener"/>
+                <flowable:taskListener event="create" class="com.kim.flowable.listener.AssignmentListener"/>
             </extensionElements>
         </userTask>
         <sequenceFlow id="flow2" sourceRef="theTask" targetRef="theEnd"/>
